@@ -57,6 +57,12 @@ class _HomeState extends State<Home> {
   Future<void> getAuth() async {
     productListService.internetConnectionAvailability =
         await checkInternetConnection();
+    if (!productListService.internetConnectionAvailability) {
+      return;
+    }
+
+    // Authenticate User and look for credantel error
+    authServiceResponse = await AuthService.login();
     if (authServiceResponse.statusCode == 200 &&
         authServiceResponse.error != 'Error Response') {
       productListService.isProductLoading = false;
@@ -69,6 +75,7 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> getProducts() async {}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,14 +88,38 @@ class _HomeState extends State<Home> {
           stream: productListService.getProductList,
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (!productListService.internetConnectionAvailability) {
-              return StatusMessage(
+              return const StatusMessage(
                 message: 'Internet connection is not available',
                 bannerMessage: 'none',
                 bannerColor: Colors.yellow,
                 textColor: Colors.black,
               );
             }
-            return Text('Hello');
+            switch (snapshot.connectionState) {
+              case ConnectionState.waiting:
+                return const Center(child: CircularProgressIndicator());
+              case ConnectionState.active:
+                if (snapshot.hasError) {
+                  return StatusMessage(
+                      message: '${snapshot.error}',
+                      bannerMessage:
+                          !productListService.internetConnectionAvailability
+                              ? 'none'
+                              : 'error',
+                      bannerColor:
+                          !productListService.internetConnectionAvailability
+                              ? Colors.yellow
+                              : Colors.red,
+                      textColor:
+                          !productListService.internetConnectionAvailability
+                              ? Colors.black
+                              : Colors.white);
+                } else if (snapshot.hasData) {
+                  //TODO: Return products
+                }
+              default:
+            }
+            return const Text('Hello');
           },
 
           // TODO Check SnapShot connection State
