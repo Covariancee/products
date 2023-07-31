@@ -2,26 +2,26 @@ import 'dart:convert';
 
 import 'product_model.dart';
 
-class ProductListModel {
+class ProductsListModel {
   List<ProductModel> products;
   int total;
   int skip;
   int limit;
 
-  ProductListModel({
+  ProductsListModel({
     required this.products,
     required this.total,
     required this.skip,
     required this.limit,
   });
 
-  factory ProductListModel.fromRawJson(String str) =>
-      ProductListModel.fromJson(json.decode(str));
+  factory ProductsListModel.fromRawJson(String str) =>
+      ProductsListModel.fromJson(json.decode(str));
 
   String toRawJson() => json.encode(toJson());
 
-  factory ProductListModel.fromJson(Map<String, dynamic> json) =>
-      ProductListModel(
+  factory ProductsListModel.fromJson(Map<String, dynamic> json) =>
+      ProductsListModel(
         products: List<ProductModel>.from(
             json["products"].map((x) => ProductModel.fromJson(x))),
         total: json["total"],
